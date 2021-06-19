@@ -1,0 +1,24 @@
+package applications
+
+import "github.com/huaweicloud/golangsdk"
+
+const (
+	rootPath     = "instances"
+	resourcePath = "apps"
+)
+
+func rootURL(c *golangsdk.ServiceClient, instanceId string) string {
+	return c.ServiceURL(rootPath, instanceId, "apps")
+}
+
+func resourceURL(c *golangsdk.ServiceClient, instanceId, appId string) string {
+	return c.ServiceURL(rootPath, instanceId, "apps", appId)
+}
+
+func codeURL(c *golangsdk.ServiceClient, instanceId, appId string) string {
+	return c.ServiceURL(rootPath, instanceId, "apps", appId, "app-codes")
+}
+
+func codeResourceURL(c *golangsdk.ServiceClient, instanceId, appId, codeId string) string {
+	return c.ServiceURL(rootPath, instanceId, "apps", appId, "app-codes", codeId)
+}
