@@ -9,33 +9,24 @@ type commonResult struct {
 	golangsdk.Result
 }
 
-type CreateResp struct {
-	// Creator of the application.
-	//     USER: The app is created by the API user.
-	//     MARKET: The app is allocated by the marketplace.
-	Creator string `json:"creator"`
-	// Update time.
-	UdpateTime string `json:"update_time"`
-	// App key.
-	AppKey string `json:"app_key"`
-	// App name.
-	Name string `json:"name"`
-	// Description.
-	Description string `json:"description"`
-	// ID.
-	Id string `json:"id"`
-	// App secret.
-	AppSecret string `json:"app_secret"`
-}
-
+// CreateResult represents a result of the Create method.
 type CreateResult struct {
 	commonResult
 }
 
-func (r CreateResult) Extract() (*CreateResp, error) {
-	var s CreateResp
-	err := r.ExtractInto(&s)
-	return &s, err
+// GetResult represents a result of the Get operation.
+type GetResult struct {
+	commonResult
+}
+
+// UpdateResult represents a result of the Update operation.
+type UpdateResult struct {
+	commonResult
+}
+
+// ResetSecretResult represents a result of the ResetAppSecret operation.
+type ResetSecretResult struct {
+	commonResult
 }
 
 type Application struct {
@@ -52,29 +43,17 @@ type Application struct {
 	// App name.
 	Name string `json:"name"`
 	// Description.
-	Description string `json:"description"`
+	Description string `json:"remark"`
 	// ID.
 	Id string `json:"id"`
 	// App secret.
 	AppSecret string `json:"app_secret"`
 	// App status.
-	Status string `json:"status"`
-	// App type. List method are not support.
-	AppType string `json:"app_type"`
+	Status int `json:"status"`
+	// App type, Currently only supports 'apig'. List method are not support.
+	Type string `json:"app_type"`
 	// Number of APIs. Only used for List method.
-	BindNum string `json:"bind_num"`
-}
-
-type GetResult struct {
-	commonResult
-}
-
-type UpdateResult struct {
-	commonResult
-}
-
-type ResetAppSecretResult struct {
-	commonResult
+	BindNum int `json:"bind_num"`
 }
 
 func (r commonResult) Extract() (*Application, error) {
@@ -83,16 +62,18 @@ func (r commonResult) Extract() (*Application, error) {
 	return &s, err
 }
 
+// ApplicationPage represents the response pages of the List operation.
 type ApplicationPage struct {
 	pagination.SinglePageBase
 }
 
-func ExtractInstances(r pagination.Page) ([]Application, error) {
+func ExtractApplications(r pagination.Page) ([]Application, error) {
 	var s []Application
 	err := r.(ApplicationPage).Result.ExtractIntoSlicePtr(&s, "apps")
 	return s, err
 }
 
+// DeleteResult represents a result of the Delete method.
 type DeleteResult struct {
 	golangsdk.ErrResult
 }
@@ -109,8 +90,23 @@ type AppCode struct {
 	CreateTime string `json:"create_time"`
 }
 
+// CreateCodeResult represents a result of the CreateAppCode method.
+type CreateCodeResult struct {
+	CodeResult
+}
+
+// AutoGenerateCodeResult represents a result of the AutoGenerateAppCode method.
+type AutoGenerateCodeResult struct {
+	CodeResult
+}
+
+// GetCodeResult represents a result of the GetAppCode method.
+type GetCodeResult struct {
+	CodeResult
+}
+
 type CodeResult struct {
-	commonResult
+	golangsdk.Result
 }
 
 func (r CodeResult) Extract() (*AppCode, error) {
@@ -119,6 +115,7 @@ func (r CodeResult) Extract() (*AppCode, error) {
 	return &s, err
 }
 
+// AppCodePage represents the response pages of the ListAppCode operation.
 type AppCodePage struct {
 	pagination.SinglePageBase
 }

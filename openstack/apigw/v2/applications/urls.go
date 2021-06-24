@@ -2,10 +2,7 @@ package applications
 
 import "github.com/huaweicloud/golangsdk"
 
-const (
-	rootPath     = "instances"
-	resourcePath = "apps"
-)
+const rootPath = "instances"
 
 func rootURL(c *golangsdk.ServiceClient, instanceId string) string {
 	return c.ServiceURL(rootPath, instanceId, "apps")
@@ -13,6 +10,10 @@ func rootURL(c *golangsdk.ServiceClient, instanceId string) string {
 
 func resourceURL(c *golangsdk.ServiceClient, instanceId, appId string) string {
 	return c.ServiceURL(rootPath, instanceId, "apps", appId)
+}
+
+func resetSecretURL(c *golangsdk.ServiceClient, instanceId, appId string) string {
+	return c.ServiceURL(rootPath, instanceId, "apps/secret", appId)
 }
 
 func codeURL(c *golangsdk.ServiceClient, instanceId, appId string) string {

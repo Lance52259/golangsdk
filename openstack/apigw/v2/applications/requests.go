@@ -29,7 +29,7 @@ func (opts AppOpts) ToAppOptsMap() (map[string]interface{}, error) {
 	return golangsdk.BuildRequestBody(opts, "")
 }
 
-// Create is a method by which to create function that create a APIG dedicated instance.
+// Create is a method by which to create function that create a APIG application.
 func Create(client *golangsdk.ServiceClient, instanceId string, opts AppOptsBuilder) (r CreateResult) {
 	reqBody, err := opts.ToAppOptsMap()
 	if err != nil {
@@ -58,19 +58,20 @@ func Get(client *golangsdk.ServiceClient, instanceId, appId string) (r GetResult
 	return
 }
 
+// ListOpts allows to filter list data using given parameters.
 type ListOpts struct {
 	// App ID.
-	Id string `json:"id"`
+	Id string `q:"id"`
 	// App name.
-	Name string `json:"name"`
+	Name string `q:"name"`
 	// App status.
-	Status string `json:"status"`
+	Status string `q:"status"`
 	// App key.
-	AppKey string `json:"app_key"`
+	AppKey string `q:"app_key"`
 	// Creator of the application.
 	//     USER: The app is created by the API user.
 	//     MARKET: The app is allocated by the marketplace.
-	Creator string `json:"creator"`
+	Creator string `q:"creator"`
 	// Offset from which the query starts.
 	// If the offset is less than 0, the value is automatically converted to 0. Default to 0.
 	Offset int `q:"offset"`
@@ -92,6 +93,7 @@ func (opts ListOpts) ToAppListQuery() (string, error) {
 	return q.String(), err
 }
 
+// List is a method to obtain an array of one or more APIG applications according to the query parameters.
 func List(client *golangsdk.ServiceClient, instanceId string, opts ListOptsBuilder) pagination.Pager {
 	url := rootURL(client, instanceId)
 	if opts != nil {
@@ -107,37 +109,39 @@ func List(client *golangsdk.ServiceClient, instanceId string, opts ListOptsBuild
 	})
 }
 
-type AppSecretResetOpts struct {
+// SecretResetOpts allows to reset application secret value using given parameters.
+type SecretResetOpts struct {
 	AppSecret string `json:"app_secret"`
 }
 
-type AppSecretResetOptsBuilder interface {
-	ToAppSecretResetOptsMap() (map[string]interface{}, error)
+type SecretResetOptsBuilder interface {
+	ToSecretResetOptsMap() (map[string]interface{}, error)
 }
 
-func (opts AppSecretResetOpts) ToAppSecretResetOptsMap() (map[string]interface{}, error) {
+func (opts SecretResetOpts) ToSecretResetOptsMap() (map[string]interface{}, error) {
 	return golangsdk.BuildRequestBody(opts, "")
 }
 
 func ResetAppSecret(client *golangsdk.ServiceClient, instanceId, appId string,
-	opts AppSecretResetOptsBuilder) (r ResetAppSecretResult) {
-	reqBody, err := opts.ToAppSecretResetOptsMap()
+	opts SecretResetOptsBuilder) (r ResetSecretResult) {
+	reqBody, err := opts.ToSecretResetOptsMap()
 	if err != nil {
 		r.Err = err
 		return
 	}
-	_, r.Err = client.Put(resourceURL(client, instanceId, appId), reqBody, &r.Body, &golangsdk.RequestOpts{
+	_, r.Err = client.Put(resetSecretURL(client, instanceId, appId), reqBody, &r.Body, &golangsdk.RequestOpts{
 		OkCodes: []int{200},
 	})
 	return
 }
 
-//Delete is a method to delete an existing application.
+// Delete is a method to delete an existing application.
 func Delete(client *golangsdk.ServiceClient, instanceId, appId string) (r DeleteResult) {
 	_, r.Err = client.Delete(resourceURL(client, instanceId, appId), nil)
 	return
 }
 
+// AppCodeOpts allows to create an application code using given parameters.
 type AppCodeOpts struct {
 	// AppCode value, which contains 64 to 180 characters, starting with a letter, plus sign (+) or slash (/).
 	// Only letters and the following special characters are allowed: +-_!@#$%/=
@@ -152,8 +156,10 @@ func (opts AppCodeOpts) ToAppCodeOptsMap() (map[string]interface{}, error) {
 	return golangsdk.BuildRequestBody(opts, "")
 }
 
-// Create is a method by which to create function that create a APIG dedicated instance.
-func CreateAppCode(client *golangsdk.ServiceClient, instanceId, appId string, opts AppCodeOptsBuilder) (r CodeResult) {
+// CreateAppCode is a method by which to create function that create a code at sepcified APIG application using
+// instanceId, appId and AppCodeOpts (code value).
+func CreateAppCode(client *golangsdk.ServiceClient, instanceId, appId string,
+	opts AppCodeOptsBuilder) (r CreateCodeResult) {
 	reqBody, err := opts.ToAppCodeOptsMap()
 	if err != nil {
 		r.Err = err
@@ -164,22 +170,27 @@ func CreateAppCode(client *golangsdk.ServiceClient, instanceId, appId string, op
 }
 
 // AutoGenerateAppCode is a method used to automatically create code in a specified application.
-func AutoGenerateAppCode(client *golangsdk.ServiceClient, instanceId, appId string) (r CodeResult) {
+func AutoGenerateAppCode(client *golangsdk.ServiceClient, instanceId, appId string) (r AutoGenerateCodeResult) {
 	_, r.Err = client.Put(codeURL(client, instanceId, appId), nil, &r.Body, nil)
 	return
 }
 
-// Get is a method to obtain the specified code of the specified application of the specified instance by codeId.
-func GetAppCode(client *golangsdk.ServiceClient, instanceId, appId, codeId string) (r CodeResult) {
+// GetAppCode is a method to obtain the specified code of the specified application of the specified instance using
+// instanceId, appId and codeId.
+func GetAppCode(client *golangsdk.ServiceClient, instanceId, appId, codeId string) (r GetCodeResult) {
 	_, r.Err = client.Get(codeResourceURL(client, instanceId, appId, codeId), &r.Body, &golangsdk.RequestOpts{
 		OkCodes: []int{200, 201},
 	})
 	return
 }
 
+// ListCodeOpts allows to filter application code list data using given parameters.
 type ListCodeOpts struct {
-	Offset int `json:"offset"`
-	Limit  int `json:"limit"`
+	// Offset from which the query starts.
+	// If the offset is less than 0, the value is automatically converted to 0. Default to 0.
+	Offset int `q:"offset"`
+	// Number of items displayed on each page.
+	Limit int `q:"limit"`
 }
 
 type ListCodeOptsBuilder interface {
