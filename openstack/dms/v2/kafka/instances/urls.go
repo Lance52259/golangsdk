@@ -41,3 +41,20 @@ func crossVpcURL(client *golangsdk.ServiceClient, id string) string {
 func autoTopicURL(c *golangsdk.ServiceClient, id string) string {
 	return c.ServiceURL(c.ProjectID, resourcePath, id, "autotopic")
 }
+
+// resetPasswordURL will build the url of resetting password
+func resetPasswordURL(c *golangsdk.ServiceClient, id string) string {
+	return c.ServiceURL(c.ProjectID, resourcePath, id, "password")
+}
+
+func configurationsURL(c *golangsdk.ServiceClient, id string) string {
+	return c.ServiceURL(c.ProjectID, "instances", id, "configs")
+}
+
+func actionURL(c *golangsdk.ServiceClient) string {
+	return c.ServiceURL(c.ProjectID, "instances", "action")
+}
+
+func tasksURL(c *golangsdk.ServiceClient, id string) string {
+	return c.ServiceURL(c.ProjectID, "instances", id, "tasks")
+}

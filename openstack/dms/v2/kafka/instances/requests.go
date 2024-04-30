@@ -81,7 +81,7 @@ type CreateOps struct {
 	// Indicates the username for logging in to the Kafka Manager.
 	// The username consists of 4 to 64 characters and can contain
 	//letters, digits, hyphens (-), and underscores (_).
-	KafkaManagerUser string `json:"kafka_manager_user" required:"true"`
+	KafkaManagerUser string `json:"kafka_manager_user,omitempty"`
 
 	// Indicates the password for logging in to the Kafka Manager.
 	// The password must meet the following complexity requirements:
@@ -91,7 +91,7 @@ type CreateOps struct {
 	// Uppercase letters
 	// Digits
 	// Special characters `~!@#$%^&*()-_=+\|[{}];:',<.>/?
-	KafkaManagerPassword string `json:"kafka_manager_password" required:"true"`
+	KafkaManagerPassword string `json:"kafka_manager_password,omitempty"`
 
 	// Indicates the time at which a maintenance time window starts.
 	// Format: HH:mm:ss
@@ -363,5 +363,80 @@ func UpdateAutoTopic(client *golangsdk.ServiceClient, id string,
 	}
 
 	_, r.Err = client.Post(autoTopicURL(client, id), body, nil, &golangsdk.RequestOpts{})
+	return
+}
+
+// ResetPasswordOpts is a struct which represents the parameter of ResetPassword function
+type ResetPasswordOpts struct {
+	// Indicates the new password of an instance.
+	NewPassword string `json:"new_password" required:"true"`
+}
+
+// ToResetPasswordMap is used for type convert
+func (opts ResetPasswordOpts) ToResetPasswordMap() (map[string]interface{}, error) {
+	return golangsdk.BuildRequestBody(opts, "")
+}
+
+// ResetPasswordOptsBuilder is an interface which can build the map parameter of ResetPassword function
+type ResetPasswordOptsBuilder interface {
+	ToResetPasswordMap() (map[string]interface{}, error)
+}
+
+// ResetPassword is used to reset password for the instance
+// via accessing to the service with POST method and parameters
+func ResetPassword(client *golangsdk.ServiceClient, id string, opts ResetPasswordOptsBuilder) (r ResetPasswordResult) {
+	body, err := opts.ToResetPasswordMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+
+	_, r.Err = client.Post(resetPasswordURL(client, id), body, nil, &golangsdk.RequestOpts{
+		OkCodes: []int{204},
+	})
+	return
+}
+
+type ConfigParam struct {
+	Name  string `json:"name" required:"true"`
+	Value string `json:"value" required:"true"`
+}
+
+type KafkaConfigs struct {
+	KafkaConfigs []ConfigParam `json:"kafka_configs"`
+}
+
+type RestartInstanceOpts struct {
+	Action    string   `json:"action" required:"true"`
+	Instances []string `json:"instances" required:"true"`
+}
+
+func ModifyConfiguration(c *golangsdk.ServiceClient, instanceID string, opts KafkaConfigs) (r ModifyConfigurationResult) {
+	b, err := golangsdk.BuildRequestBody(opts, "")
+	if err != nil {
+		r.Err = err
+		return
+	}
+
+	_, r.Err = c.Put(configurationsURL(c, instanceID), b, &r.Body, &golangsdk.RequestOpts{})
+	return
+}
+
+func GetConfigurations(c *golangsdk.ServiceClient, instanceID string) (r GetConfigurationResult) {
+	_, r.Err = c.Get(configurationsURL(c, instanceID), &r.Body, &golangsdk.RequestOpts{
+		MoreHeaders: map[string]string{"Content-Type": "application/json"},
+	})
+	return
+}
+
+func RebootInstance(c *golangsdk.ServiceClient, params RestartInstanceOpts) (r RebootResult) {
+	_, r.Err = c.Post(actionURL(c), params, &r.Body, &golangsdk.RequestOpts{})
+	return
+}
+
+func GetTasks(c *golangsdk.ServiceClient, instanceID string) (r GetTasksResult) {
+	_, r.Err = c.Get(tasksURL(c, instanceID), &r.Body, &golangsdk.RequestOpts{
+		MoreHeaders: map[string]string{"Content-Type": "application/json"},
+	})
 	return
 }

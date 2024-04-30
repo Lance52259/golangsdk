@@ -51,6 +51,12 @@ func (r CreateResult) Extract() (*Instance, error) {
 	return &response, err
 }
 
+func (r CreateResult) ExtractEnabled() (*EnabledOpts, error) {
+	var response EnabledOpts
+	err := r.ExtractInto(&response)
+	return &response, err
+}
+
 type UpdateInstanceResult struct {
 	commonResult
 }
@@ -92,6 +98,7 @@ type ListInstanceResponse struct {
 type InstanceResponse struct {
 	Id                  string         `json:"id"`
 	Name                string         `json:"name"`
+	Remark              string         `json:"remark"`
 	Status              string         `json:"status"`
 	Port                string         `json:"port"`
 	Mode                string         `json:"mode"`
@@ -163,4 +170,23 @@ type PortUpdateResp struct {
 	JobId string `json:"job_id"`
 	// Database access port.
 	Port int `json:"port"`
+}
+
+type BackupPolicyResp struct {
+	BackupPolicy BackupStrategy `json:"backup_policy"`
+}
+
+type AvailabilityZoneResp struct {
+	// Job ID.
+	JobId string `json:"job_id"`
+}
+
+type CommonResp struct {
+	// Job ID.
+	JobId string `json:"job_id"`
+}
+
+type SlowLogStatusResp struct {
+	// Status.
+	Status string `json:"status"`
 }
