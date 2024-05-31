@@ -1,6 +1,7 @@
 package instances
 
 import (
+	"fmt"
 	"github.com/chnsz/golangsdk"
 	"github.com/chnsz/golangsdk/openstack/common/tags"
 	"github.com/chnsz/golangsdk/pagination"
@@ -874,5 +875,31 @@ func GetSecondLevelMonitoring(c *golangsdk.ServiceClient, instanceId string) (r 
 	_, r.Err = c.Get(getURL(c, instanceId, "second-level-monitor"), &r.Body, &golangsdk.RequestOpts{
 		MoreHeaders: requestOpts.MoreHeaders,
 	})
+	return
+}
+
+type ModifyPrivateDnsNamePrefixOpts struct {
+	DnsName string `json:"dns_name" required:"true"`
+}
+
+func (opts ModifyPrivateDnsNamePrefixOpts) ToActionInstanceMap() (map[string]interface{}, error) {
+	return toActionInstanceMap(opts)
+}
+
+// ModifyPrivateDnsNamePrefix is a method used to modify private dns name prefix of the instance.
+func ModifyPrivateDnsNamePrefix(c *golangsdk.ServiceClient, opts ActionInstanceBuilder, instanceId string) (r JobResult) {
+	b, err := opts.ToActionInstanceMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = c.Put(updateURL(c, instanceId, "modify-dns"), b, &r.Body, &golangsdk.RequestOpts{})
+	return
+}
+
+// ModifySlowLogShowOriginalStatus is a method used to modify slow log show original status of the instance.
+func ModifySlowLogShowOriginalStatus(c *golangsdk.ServiceClient, instanceId, status string) (r ModifySlowLogShowOriginalStatusResult) {
+	_, r.Err = c.Put(updateURL(c, instanceId, fmt.Sprintf("slowlog-sensitization/%s", status)), nil,
+		&r.Body, &golangsdk.RequestOpts{})
 	return
 }

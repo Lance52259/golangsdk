@@ -49,3 +49,23 @@ func slowLogStatusURL(c *golangsdk.ServiceClient, instanceId string, status stri
 func restartURL(c *golangsdk.ServiceClient, instanceId string) string {
 	return c.ServiceURL("instances", instanceId, "restart")
 }
+
+func maintenanceWindowURL(c *golangsdk.ServiceClient, instanceId string) string {
+	return c.ServiceURL("instances", instanceId, "maintenance-window")
+}
+
+func balancerURL(c *golangsdk.ServiceClient, instanceId string) string {
+	return c.ServiceURL("instances", instanceId, "balancer")
+}
+
+func balancerSwitchURL(c *golangsdk.ServiceClient, instanceId, action string) string {
+	return c.ServiceURL("instances", instanceId, "balancer", action)
+}
+
+func balancerActiveWindowURL(c *golangsdk.ServiceClient, instanceId string) string {
+	return c.ServiceURL("instances", instanceId, "balancer/active-window")
+}
+
+func clientNetworkRangesURL(c *golangsdk.ServiceClient, instanceId string) string {
+	return c.ServiceURL("instances", instanceId, "client-network")
+}

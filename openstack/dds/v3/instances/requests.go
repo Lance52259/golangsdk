@@ -183,6 +183,11 @@ type UpdateNodeNumOpts struct {
 	IsAutoPay bool        `json:"is_auto_pay,omitempty"`
 }
 
+type UpdateReplicaSetNodeNumOpts struct {
+	Num       int  `json:"num" required:"true"`
+	IsAutoPay bool `json:"is_auto_pay,omitempty"`
+}
+
 type SpecOpts struct {
 	TargetType     string `json:"target_type,omitempty"`
 	TargetID       string `json:"target_id" required:"true"`
@@ -322,6 +327,11 @@ type ReplicaSetNameOpts struct {
 	Name string `json:"name" required:"true"`
 }
 
+type BalancerActiveWindowOpts struct {
+	StartTime string `json:"start_time,omitempty"`
+	StopTime  string `json:"stop_time,omitempty"`
+}
+
 type RestartOpts struct {
 	TargetType string `json:"target_type,omitempty"`
 	TargetId   string `json:"target_id" required:"true"`
@@ -333,6 +343,15 @@ type AvailabilityZoneOpts struct {
 
 type RemarkOpts struct {
 	Remark string `json:"remark"`
+}
+
+type ChangeMaintenanceWindowOpts struct {
+	StartTime string `json:"start_time" required:"true"`
+	EndTime   string `json:"end_time" required:"true"`
+}
+
+type UpdateClientNetworkOpts struct {
+	ClientNetworkRanges *[]string `json:"client_network_ranges" required:"true"`
 }
 
 // UpdateReplicaSetName is a method to update the replica set name.
@@ -404,4 +423,74 @@ func RestartInstance(c *golangsdk.ServiceClient, instanceId string, opts Restart
 		MoreHeaders: requestOpts.MoreHeaders,
 	})
 	return &r, err
+}
+
+// UpdateMaintenanceWindow is a method to update maintenance time.
+func UpdateMaintenanceWindow(c *golangsdk.ServiceClient, instanceId string, opts ChangeMaintenanceWindowOpts) error {
+	b, err := golangsdk.BuildRequestBody(opts, "")
+	if err != nil {
+		return err
+	}
+
+	_, err = c.Put(maintenanceWindowURL(c, instanceId), b, nil, &golangsdk.RequestOpts{
+		MoreHeaders: requestOpts.MoreHeaders,
+		OkCodes: []int{
+			204,
+		},
+	})
+	return err
+}
+
+// UpdateBalancerSwicth is a method to enable or disable the balancer.
+func UpdateBalancerSwicth(c *golangsdk.ServiceClient, instanceId string, action string) (*CommonResp, error) {
+	var r CommonResp
+	_, err := c.Put(balancerSwitchURL(c, instanceId, action), nil, &r, &golangsdk.RequestOpts{
+		MoreHeaders: requestOpts.MoreHeaders,
+	})
+	return &r, err
+}
+
+// UpdateBalancerActiveWindow is a method to set the balancer active window.
+func UpdateBalancerActiveWindow(c *golangsdk.ServiceClient, instanceId string, opts BalancerActiveWindowOpts) (*CommonResp, error) {
+	b, err := golangsdk.BuildRequestBody(opts, "")
+	if err != nil {
+		return nil, err
+	}
+
+	var r CommonResp
+	_, err = c.Put(balancerActiveWindowURL(c, instanceId), b, &r, &golangsdk.RequestOpts{
+		MoreHeaders: requestOpts.MoreHeaders,
+	})
+	return &r, err
+}
+
+// GetBalancer is a method to get the balancer configuration.
+func GetBalancer(c *golangsdk.ServiceClient, instanceId string) (*BalancerResp, error) {
+	var r BalancerResp
+	_, err := c.Get(balancerURL(c, instanceId), &r, &golangsdk.RequestOpts{
+		MoreHeaders: requestOpts.MoreHeaders,
+	})
+	return &r, err
+}
+
+// GetClientNetWorkRanges is a method to get the client network ranges.
+func GetClientNetWorkRanges(c *golangsdk.ServiceClient, instanceId string) (*UpdateClientNetworkOpts, error) {
+	var r UpdateClientNetworkOpts
+	_, err := c.Get(clientNetworkRangesURL(c, instanceId), &r, &golangsdk.RequestOpts{
+		MoreHeaders: requestOpts.MoreHeaders,
+	})
+	return &r, err
+}
+
+// UpdateClientNetWorkRanges is a method to update client network ranges.
+func UpdateClientNetWorkRanges(c *golangsdk.ServiceClient, instanceId string, opts UpdateClientNetworkOpts) error {
+	b, err := golangsdk.BuildRequestBody(opts, "")
+	if err != nil {
+		return err
+	}
+
+	_, err = c.Post(clientNetworkRangesURL(c, instanceId), b, nil, &golangsdk.RequestOpts{
+		MoreHeaders: requestOpts.MoreHeaders,
+	})
+	return err
 }
