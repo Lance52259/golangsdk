@@ -71,6 +71,9 @@ type CreateOps struct {
 	// Indicates the ID of a subnet.
 	SubnetID string `json:"subnet_id" required:"true"`
 
+	// Whether to enable the IPv6.
+	Ipv6Enable bool `json:"ipv6_enable,omitempty"`
+
 	// Indicates the ID of an AZ.
 	// The parameter value can be left blank or an empty array.
 	AvailableZones []string `json:"available_zones" required:"true"`
@@ -115,6 +118,9 @@ type CreateOps struct {
 
 	// Indicates whether to enable SSL-encrypted access.
 	SslEnable bool `json:"ssl_enable,omitempty"`
+
+	// Whether to enable vpc client plain
+	VpcClientPlain bool `json:"vpc_client_plain,omitempty"`
 
 	// Indicates the protocol to use after SASL is enabled.
 	KafkaSecurityProtocol string `json:"kafka_security_protocol,omitempty"`
@@ -295,12 +301,13 @@ func List(client *golangsdk.ServiceClient, opts ListOpsBuilder) pagination.Pager
 }
 
 type ResizeInstanceOpts struct {
-	NewSpecCode     *string `json:"new_spec_code,omitempty"`
-	NewStorageSpace *int    `json:"new_storage_space,omitempty"`
-	OperType        *string `json:"oper_type,omitempty"`
-	NewBrokerNum    *int    `json:"new_broker_num,omitempty"`
-	NewProductID    *string `json:"new_product_id,omitempty"`
-	PublicIpID      *string `json:"publicip_id,omitempty"`
+	NewSpecCode     *string  `json:"new_spec_code,omitempty"`
+	NewStorageSpace *int     `json:"new_storage_space,omitempty"`
+	OperType        *string  `json:"oper_type,omitempty"`
+	NewBrokerNum    *int     `json:"new_broker_num,omitempty"`
+	NewProductID    *string  `json:"new_product_id,omitempty"`
+	PublicIpID      *string  `json:"publicip_id,omitempty"`
+	TenantIps       []string `json:"tenant_ips,omitempty"`
 }
 
 func Resize(client *golangsdk.ServiceClient, id string, opts ResizeInstanceOpts) (string, error) {

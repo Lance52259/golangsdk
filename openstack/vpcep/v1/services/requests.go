@@ -39,6 +39,8 @@ type CreateOpts struct {
 	Tags []tags.ResourceTag `json:"tags,omitempty"`
 	// Specifies the description
 	Description string `json:"description,omitempty"`
+	// Specifies the IP version of the VPC endpoint service
+	IpVersion string `json:"ip_version,omitempty"`
 	// Specifies whether the VPC endpoint policy is enabled.
 	EnablePolicy *bool `json:"enable_policy,omitempty"`
 }
@@ -97,6 +99,8 @@ type UpdateOpts struct {
 	VipPortID string `json:"vip_port_id,omitempty"`
 	// Specifies the description
 	Description *string `json:"description,omitempty"`
+	// Specifies whether the client IP address and port number or marker_id information is transmitted to the server.
+	TCPProxy string `json:"tcp_proxy,omitempty"`
 }
 
 // ToServiceUpdateMap builds an update body based on UpdateOpts.
